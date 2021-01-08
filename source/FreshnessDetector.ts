@@ -22,6 +22,7 @@ export class FreshnessDetector {
   */
   async isFresh(lastModified: number): Promise<boolean> {
     // TODO: This needs to come from configuration.
+    //       And it should always include `package.json` somehow.
     const sourceDirectory = xfs.pathUtils.join(this._workspace.cwd, "source" as PortablePath);
 
     const timeSource = await this._getLastModifiedForFolder(sourceDirectory);

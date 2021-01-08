@@ -84,6 +84,9 @@ export class WorkspaceAuditor {
     for (const descriptor of workspace.dependencies.values()) {
       const dependencyWorkspace = this._workspace.project.tryWorkspaceByDescriptor(descriptor);
 
+      // If the dependency is not a workspace, then we don't care about it.
+      // We only care about local workspaces with local files that could have
+      // been changed by the user.
       if (!dependencyWorkspace) {
         continue;
       }
@@ -91,6 +94,9 @@ export class WorkspaceAuditor {
       const dependencyReport = new WorkspaceReport(dependencyWorkspace);
       report.dependencies.set(workspace.relativeCwd, dependencyReport);
 
+      // If the path we're currently traversing already contains this descriptor,
+      // then there's a circular dependency.
+      // Note this in the report and abort execution of this branch.
       if (path.includes(descriptor)) {
         dependencyReport.loopsBackToParent = true;
         continue;
