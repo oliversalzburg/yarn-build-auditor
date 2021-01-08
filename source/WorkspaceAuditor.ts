@@ -151,7 +151,7 @@ export class WorkspaceAuditor {
 
       if (!isDependencyFresh) {
         // Some of the files in the dependency workspace, or its nested
-        // dependency workspaces, are not fresh. So we're not fresh either.
+        // dependency workspaces, are not fresh. Mark this on the report.
         dependencyReport.isFresh = false;
         report.dependenciesWereFresh = false;
       }
@@ -167,6 +167,8 @@ export class WorkspaceAuditor {
       }
     }
 
+    // Our freshness is defined through the freshness of our dependcies and our files.
+    // If either isn't fresh, then we're not either.
     return report.dependenciesWereFresh && report.filesWereFresh;
   }
 }
