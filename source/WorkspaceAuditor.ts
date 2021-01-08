@@ -6,14 +6,49 @@ import { FreshnessCatalog } from "./FreshnessCatalog";
  * auditing run of a workspace.
  */
 export class WorkspaceReport {
+  /**
+   * The workspace this report was generated for.
+   */
   workspace: Workspace;
+
+  /**
+   * Is the workspace fresh overall?
+   */
   isFresh: boolean | undefined = undefined;
+
+  /**
+   * Does this workspace create a circular dependency by
+   * referring to a workspace further up in the tree?
+   */
   loopsBackToParent: boolean | undefined = undefined;
+
+  /**
+   * When audited, were the dependency workspaces of this
+   * workspace determined to be fresh?
+   */
   dependenciesWereFresh: boolean | undefined = undefined;
+
+  /**
+   * When audited, were the files in the workspace determined
+   * to be fresh?
+   */
   filesWereFresh: boolean | undefined = undefined;
+
+  /**
+   * When the "file freshness" was checked, did we use a result
+   * from the catalog that was already cached in the catalog?
+   */
   fileFreshnessFromCache: boolean | undefined = undefined;
+
+  /**
+   * The reports for the dependency workspaces in this workspace.
+   */
   dependencies = new Map<string, WorkspaceReport>();
 
+  /**
+   * Construct a `WorkspaceReport` for the given workspace.
+   * @param workspace The workspace this report is for.
+   */
   constructor(workspace: Workspace) {
     this.workspace = workspace;
   }
