@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    // Allow us to easily import modules that have no default export.
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    // Allow us to use decorators.
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    // Import helper functions at runtime instead of putting them in each
+    // code unit. This required `tslib` to be available.
+    "importHelpers": true,
+    // Produce modules that load each other with `require()`.
+    "module": "CommonJS",
+    // Generate source maps for the compiled code units.
+    "sourceMap": true,
+    // Enable extended type checking, increased strictness.
+    "strict": true,
+    // Targetting Node 12+.
+    "target": "ES2019",
+    // We specifically no longer want declarations, as they are causing problems
+    // with the export of mixins. We're just using the reflect-metadata approach
+    // for our ORM now (we used to do this differently in the past).
+    "declaration": false,
+    // Don't check dependencies for correctness. It's a pointless endevour.
+    "skipLibCheck": true,
+    "types": ["@types/jest", "@types/node"],
+    "rootDir": "source",
+    "outDir": "output",
+    "incremental": true
+  },
+  "exclude": [".yarn", "packages/*/output"],
+  "include": ["source"]
+}
