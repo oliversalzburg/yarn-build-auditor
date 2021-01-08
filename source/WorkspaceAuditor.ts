@@ -1,6 +1,10 @@
 import { Descriptor, Ident, Workspace } from "@yarnpkg/core";
 import { FreshnessCatalog } from "./FreshnessCatalog";
 
+/**
+ * Contains all the information that was collected during an
+ * auditing run of a workspace.
+ */
 export class WorkspaceReport {
   workspace: Workspace;
   isFresh: boolean | undefined = undefined;
@@ -15,17 +19,27 @@ export class WorkspaceReport {
   }
 }
 
+/**
+ * Audits a single workspace for freshness - if there have been changes since
+ * a given point in time.
+*/
 export class WorkspaceAuditor {
   private _workspace: Workspace;
 
+  /**
+   * Constructs a new `WorkspaceAuditor`
+   * @param workspace The workspace to audit.
+   */
   constructor(workspace: Workspace) {
     this._workspace = workspace;
   }
 
+  /**
+   * Audit the workspace for freshness and return a report of the findings.
+   * @param freshnessCatalog A freshness cache to speed up the process.
+   */
   async audit(freshnessCatalog: FreshnessCatalog): Promise<WorkspaceReport> {
     const report = new WorkspaceReport(this._workspace);
-
-    //console.debug(`? Auditing ${this._renderWorkspaceName(this._workspace.manifest.name)}...`);
 
     const workspaceIsFresh = await this._auditDependencyWorkspace(
       this._workspace,
@@ -35,12 +49,18 @@ export class WorkspaceAuditor {
     );
     report.isFresh = workspaceIsFresh;
 
-    //console.debug(`! Workspace is ${workspaceIsFresh ? "fresh" : "dirty"}`);
-    //console.debug(``);
-
     return report;
   }
 
+  /**
+   * Audit the workspaces our main workspace depends upon.
+   * This way we can recursively determine if the entire branch of the project
+   * tree is fresh or not.
+   * @param workspace The workspace to audit.
+   * @param freshnessCatalog The freshness cache.
+   * @param path The path on the dependency tree that we're currently traversing.
+   * @param report The report for the current workspace.
+  */
   private async _auditDependencyWorkspace(
     workspace: Workspace,
     freshnessCatalog: FreshnessCatalog,
@@ -72,11 +92,6 @@ export class WorkspaceAuditor {
       report.dependencies.set(workspace.relativeCwd, dependencyReport);
 
       if (path.includes(descriptor)) {
-        // console.warn(
-        //   `${this._indent(path.length + 1)}${this._renderWorkspaceName(
-        //     workspace.manifest.name
-        //   )} → ${descriptor.name} loops back`
-        // );
         dependencyReport.loopsBackToParent = true;
         continue;
       }
@@ -109,30 +124,8 @@ export class WorkspaceAuditor {
         dependencyReport.isFresh = false;
         report.dependenciesWereFresh = false;
       }
-
-      // console.debug(
-      //   `${this._indent(path.length + 1)}${this._renderWorkspaceName(workspace.manifest.name)} → ${
-      //     descriptor.name
-      //   } fresh`
-      // );
     }
 
     return report.dependenciesWereFresh && report.filesWereFresh;
-  }
-
-  private _renderWorkspaceName(name: Ident | null): string {
-    if (!name) {
-      throw new Error("missing name");
-    }
-
-    if (name.scope) {
-      return `@${name.scope}/${name.name}`;
-    }
-
-    return name.name;
-  }
-
-  private _indent(depth: number): string {
-    return "  ".repeat(depth);
   }
 }
