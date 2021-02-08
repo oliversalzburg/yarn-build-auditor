@@ -127,7 +127,7 @@ export class WorkspaceAuditor {
       }
 
       const dependencyReport = new WorkspaceReport(dependencyWorkspace);
-      report.dependencies.set(workspace.relativeCwd, dependencyReport);
+      report.dependencies.set(dependencyWorkspace.relativeCwd, dependencyReport);
 
       // If the path we're currently traversing already contains this descriptor,
       // then there's a circular dependency.
